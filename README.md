@@ -52,7 +52,7 @@ carbon-ai/
 ## Installation
 git clone https://github.com/your-username/carbon-ai.git
 cd carbon-ai
-npm install
+npm install or npm install -f
 
 ## Run the Project
 

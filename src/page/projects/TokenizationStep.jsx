@@ -22,6 +22,7 @@ import VintageForm from "../../components/TokenizationStep/AddNominalUncertainit
 import AddEmissionData from "../../components/TokenizationStep/AddEmissionData";
 import AddLickageData from "../../components/TokenizationStep/AddLickageData";
 import BufferSetting from "../../components/TokenizationStep/BufferSetting";
+import IssuanceFinalScreen from "../../components/TokenizationStep/PreviewIssuance";
 
 const steps = [
     "Register Sensor Devices",
@@ -88,8 +89,10 @@ export default function TokenizationStepper() {
             else if (data?.audit?.leakage?.length === 0) {
                 setActiveStep(6);
             }
-            else {
+            else if (!data?.vintageParameters?.every(v => v.bufferPct)) {
                 setActiveStep(7);
+            } else {
+                setActiveStep(8);
             }
 
         }
@@ -243,6 +246,13 @@ export default function TokenizationStepper() {
                                             }
                                             handleNext()
                                         }}
+                                        handleBack={handleBack}
+                                    />
+                                }
+                                {activeStep === 8 &&
+                                    <IssuanceFinalScreen
+                                        projectId={projectId}
+                                        handleNext={handleNext}
                                         handleBack={handleBack}
                                     />
                                 }

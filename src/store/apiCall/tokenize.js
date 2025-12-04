@@ -371,3 +371,25 @@ export const addBufferPercentageData = (
 
     return results;
 };
+
+
+
+/** * This function is used to get issuance preview data by project id
+ * @param {string} projectId 
+ * @param {Function} setLoading 
+ * @param {Function} setProjectDetails  
+ */
+
+export const getIssuanceDataByProjectId = (projectId, setLoading, setProjectDetails, loading = true) => async (dispatch) => {
+    setLoading(loading);
+    try {
+        const response = await axiosInstance.post(`/admin/issuance/preview`, { projectId });
+        if (response.status === 200) {
+            setProjectDetails(response?.data || null)
+        }
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setLoading(false);
+    }
+}
