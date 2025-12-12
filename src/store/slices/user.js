@@ -15,8 +15,8 @@ export const fetchUsers = (setLoading, setUsers, setFilteredUsers, loading = tru
     try {
         const response = await axiosInstance.get("/admin/users");
         if (response.status === 200) {
-            setUsers(response?.data?.users || []);
-            setFilteredUsers(response?.data?.users || []);
+            setUsers && setUsers(response?.data?.users || []);
+            setFilteredUsers && setFilteredUsers(response?.data?.users || []);
         }
     } catch (error) {
         dispatch(enqueue({ message: "Failed to fetch user data.", variant: "error" }));

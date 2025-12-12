@@ -22,6 +22,27 @@ export const getAllProject = (setLoading, setProjects, loading = true) => async 
 }
 
 
+/**
+ * this function used to fetch auditor assigned project list
+ * @param {Function} setLoading 
+ * @param {Function} setProjects 
+ */
+
+export const getAllProjectForAuditor = (setLoading, setProjects, loading = true) => async (dispatch) => {
+    setLoading(loading);
+    try {
+        const response = await axiosInstance.get("/verifier/assignments");
+        if (response.status === 200) {
+            setProjects(response?.data?.assignments || [])
+        }
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setLoading(false);
+    } 
+}
+
+
 
 /**
  * This function used fetch project details by projectId

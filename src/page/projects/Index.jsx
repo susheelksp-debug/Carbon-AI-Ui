@@ -11,8 +11,8 @@ import {
     IconButton
 } from "@mui/material";
 import { Leaf, Plus, Eye, Pencil, Key, Hash, Zap } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { creatProject, getAllProject } from "../../store/apiCall/projects";
+import { useDispatch, useSelector } from "react-redux";
+import { creatProject, getAllProject, getAllProjectForAuditor } from "../../store/apiCall/projects";
 import formatDate from "../../utils/date-format";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "../../components/loading/LoadingScreen";
@@ -25,7 +25,7 @@ import Page from "../../components/helmet/Page";
 
 export function ProjectCard({ project, viewProjectDetails, tokenizeProject }) {
     return (
-        <Card sx={{ mb: 4, borderRadius: 3, boxShadow: 4 }}>
+        <Card sx={{ borderRadius: 3, boxShadow: 4 }}>
             <CardContent>
                 <Box display="flex" alignItems="center" gap={1}>
                     <Leaf size={22} />
@@ -81,6 +81,7 @@ export function ProjectCard({ project, viewProjectDetails, tokenizeProject }) {
 // App (root)
 // ------------------------------
 export default function Projects() {
+    const { user } = useSelector((state) => state.auth);
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
@@ -90,7 +91,11 @@ export default function Projects() {
 
 
     useEffect(() => {
-        dispatch(getAllProject(setLoading, setProjects))
+        if (user?.role !== 'verifier') {
+            dispatch(getAllProject(setLoading, setProjects))
+        } else {
+            dispatch(getAllProjectForAuditor(setLoading, setProjects))
+        }
     }, [])
 
     const viewProjectDetails = (projectId) => {

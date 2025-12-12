@@ -13,6 +13,7 @@ import {
   ListItemIcon,
   Divider,
   Box,
+  Chip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { ChevronRight } from "@mui/icons-material";
@@ -24,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../instance";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { LogOut } from "lucide-react";
 
 export const drawerWidth = 260;
 export const collapsedWidth = 72;
@@ -56,13 +58,14 @@ const StyledAppBar = styled(AppBar, {
   },
 }));
 
-export default function Header({ onMenuClick, open = true, user }) {
+export default function Header({ onMenuClick, open = true, }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useDispatch();
   const showMenuButton = isMobile || !open;
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state?.auth);
+  const { user } = useSelector((state) => state.auth);
 
   // notifications menu
   const [notifAnchor, setNotifAnchor] = React.useState(null);
@@ -96,6 +99,12 @@ export default function Header({ onMenuClick, open = true, user }) {
     axiosInstance.defaults.headers.common["Authorization"] = "";
     navigate("/", { replace: true });
   };
+
+  const capitalizeFirst = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
 
   // show hamburger when:
   // - mobile (always), OR
@@ -134,6 +143,16 @@ export default function Header({ onMenuClick, open = true, user }) {
               <NotificationsIcon />
             </Badge>
           </IconButton> */}
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            <Typography variant="body1" fontWeight={600}>
+              {user?.email}
+            </Typography>
+
+
+            <Chip variant="outlined" size="small" color="success.light" label={capitalizeFirst(user?.role)} />
+          </Box>
+
 
           {/* <Menu
             anchorEl={notifAnchor}
@@ -177,9 +196,7 @@ export default function Header({ onMenuClick, open = true, user }) {
 
           {/* Profile / Avatar */}
           <IconButton onClick={handleProfileOpen} size="small" sx={{ ml: 1 }}>
-            <Avatar src={avatarUrl} sx={{ width: 36, height: 36, fontSize: 14 }}>
-              {(!avatarUrl && isLoggedIn?.user?.username ? isLoggedIn?.user?.username?.charAt(0) : "")}
-            </Avatar>
+            <LogOut size={24} color="#ffffff" />
           </IconButton>
 
           <Menu
@@ -192,28 +209,15 @@ export default function Header({ onMenuClick, open = true, user }) {
           >
             <Box sx={{ px: 2, py: 1.25 }}>
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                {isLoggedIn?.user?.username || "Rajarshi Das"}
+                {isLoggedIn?.user?.email || "Rajarshi Das"}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {isLoggedIn?.user?.email || ""}
+                {capitalizeFirst(isLoggedIn?.user?.role) || ""}
               </Typography>
             </Box>
 
             <Divider />
 
-            <MenuItem onClick={handleGotoProfile}>
-              <ListItemIcon>
-                <PersonOutline fontSize="small" />
-              </ListItemIcon>
-              Profile
-            </MenuItem>
-
-            <MenuItem onClick={() => { handleProfileClose(); navigate("/app/settings"); }}>
-              <ListItemIcon>
-                <Settings fontSize="small" />
-              </ListItemIcon>
-              Settings
-            </MenuItem>
 
             <Divider />
 

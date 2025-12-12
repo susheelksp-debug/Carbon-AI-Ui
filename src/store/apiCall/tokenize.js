@@ -393,3 +393,153 @@ export const getIssuanceDataByProjectId = (projectId, setLoading, setProjectDeta
         setLoading(false);
     }
 }
+
+
+/**
+ * This function used to confirm carbon Issuance to project.
+ * @param {Function} setLoading 
+ * @param {JSON} payload 
+ * @param {Function} callBack 
+ */
+
+
+export const confirmCarbonIssuance = (setLoading, payload, callBack) => async (dispatch) => {
+    setLoading(true);
+    try {
+        const response = await axiosInstance.post(`/owner/issuance/confirm-methodology`, payload)
+        if (response.status === 201) {
+            dispatch(enqueue({ message: "Methodology confirmed successfully for issuance.", variant: 'success' }));
+            if (callBack) callBack();
+        }
+    } catch (error) {
+        console.error("Failed to confirm the methodology. Please try again:", error);
+        dispatch(enqueue({ message: error?.response?.data?.error || "Failed to confirm the methodology. Please try again.", variant: 'error' }));
+    } finally {
+        setLoading(false);
+    }
+}
+
+/**
+ * This function used to assign auditor to the project.
+ * @param {string} projectId
+ * @param {Function} setLoading 
+ * @param {JSON} payload 
+ * @param {Function} callBack 
+ */
+
+
+export const assignAuditor = (projectId, setLoading, payload, callBack) => async (dispatch) => {
+    setLoading(true);
+    try {
+        const response = await axiosInstance.post(`/admin/projects/${projectId}/auditor`, payload)
+        if (response.status === 200) {
+            dispatch(enqueue({ message: "Auditor assigned to the project Successfully.", variant: 'success' }));
+            if (callBack) callBack();
+        }
+    } catch (error) {
+        console.error("Failed to assign the auditor to the project. Please try again:", error);
+        dispatch(enqueue({ message: error?.response?.data?.error || "Failed to assign the auditor to the project. Please try again.", variant: 'error' }));
+    } finally {
+        setLoading(false);
+    }
+}
+
+
+
+/** * This function is used to submit audit data of project
+ * @param {string} projectId 
+ * @param {Function} setLoading
+ * @param {ArrayIterator} payloadArray
+ * @param {Function} onAllSuccess - callback function to be called if all registrations succeed
+ */
+export const submitAuditData = (
+    projectId,
+    setLoading,
+    payloadArray,
+    onAllSuccess // <-- callback function
+) => async (dispatch) => {
+    setLoading(true)
+    const results = {
+        success: [],
+        failed: []
+    };
+
+    for (const payload of payloadArray) {
+        try {
+            const response = await axiosInstance.post(
+                `/admin/projects/${projectId}/audit`,
+                payload
+            );
+
+            results.success.push({
+                moduleIndex: payload.moduleIndex,
+                response: response.data
+            });
+
+        } catch (error) {
+            results.failed.push({
+                moduleIndex: payload.moduleIndex,
+                error: error.response?.data || error.message
+            });
+            dispatch(enqueue({ message: error?.response?.data?.error || "Submitting audit data is failed. Please try again.", variant: 'error' }));
+            setLoading(false);
+            return; // Exit on first failure
+        }
+    }
+
+    // 🔥 only call callback if everything succeeded
+    if (results.failed.length === 0) {
+        if (typeof onAllSuccess === "function") {
+            onAllSuccess(results.success);
+            dispatch(enqueue({ message: "Audit Data submitted successfully.", variant: 'success' }));
+        }
+    }
+    setLoading(false);
+
+    return results;
+};
+
+
+/**
+ * This function used to create credits to the project.
+ * @param {JSON} payload 
+ * @param {Function} callBack 
+ */
+
+
+export const createCredits = (setVintage, payload, callBack) => async (dispatch) => {
+    try {
+        const response = await axiosInstance.post(`/admin/credits`, payload)
+        if (response.status === 201) {
+            dispatch(enqueue({ message: "Credits are created Successfully.", variant: 'success' }));
+            if (callBack) callBack();
+        }
+    } catch (error) {
+        console.error("Failed to create credits. Please try again:", error);
+        dispatch(enqueue({ message: error?.response?.data?.error || "Failed to create credits. Please try again.", variant: 'error' }));
+    } finally {
+        setVintage(null)
+    }
+}
+
+/**
+ * This function used to mint tokens to the project.
+ * @param {JSON} payload 
+ * @param {Function} callBack 
+ */
+
+
+export const mintTokens = (setVintage, payload, callBack) => async (dispatch) => {
+    try {
+        const response = await axiosInstance.post(`/admin/issuance/execute`, payload)
+        if (response.status === 200) {
+            dispatch(enqueue({ message: "Tokens are minted Successfully.", variant: 'success' }));
+            if (callBack) callBack();
+        }
+    } catch (error) {
+        console.error("Failed to mint tokens. Please try again:", error);
+        dispatch(enqueue({ message: error?.response?.data?.error || "Failed to mint tokens. Please try again.", variant: 'error' }));
+    } finally {
+        setVintage(null)
+    }
+}

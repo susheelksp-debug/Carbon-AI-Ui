@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 3000
+  },
   esbuild: {
     loader: "jsx", // 👈 Treat .js files as JSX
     include: /src\/.*\.[jt]sx?$/, // Apply to .js, .jsx, .ts, .tsx
