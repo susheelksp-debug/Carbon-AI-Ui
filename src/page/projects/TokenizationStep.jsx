@@ -28,8 +28,10 @@ import SubmitAuditorDecision from "../../components/TokenizationStep/SubmitAudit
 import CheckIcon from "@mui/icons-material/Check";
 import CreateCredits from "../../components/TokenizationStep/CreateCredits";
 import ExecuteMint from "../../components/TokenizationStep/ExecuteMint";
+import ProjectDetails from "./ProjectDetails";
 
 const steps = [
+    "Project Overview",
     "Register Sensor Devices",
     "Register Calibrations",
     "Record Telemetry",
@@ -81,19 +83,20 @@ export default function TokenizationStepper() {
         if (!data) return [];
 
         const completed = [];
-
-        if (data.modules?.every((m) => m.sensors.length > 0)) completed.push(0);
-        if (everySensorHavingCalibration) completed.push(1);
-        if (everySensorHavingTelemetry) completed.push(2);
-        if (data.onchain?.methodologyIdentifier) completed.push(3);
-        if (data.vintageParameters?.length > 0) completed.push(4);
-        if (data.audit?.emissionEvidence?.length > 0) completed.push(5);
-        if (data.audit?.leakage?.length > 0) completed.push(6);
+        if (data?.projectName) completed.push(0);
+        if (data.modules?.every((m) => m.sensors.length > 0)) completed.push(1);
+        if (everySensorHavingCalibration) completed.push(2);
+        if (everySensorHavingTelemetry) completed.push(3);
+        if (data.onchain?.methodologyIdentifier) completed.push(4);
+        if (data.vintageParameters?.length > 0) completed.push(5);
+        if (data.audit?.emissionEvidence?.length > 0) completed.push(6);
+        if (data.audit?.leakage?.length > 0) completed.push(7);
         if (data?.vintageParameters?.length > 0 && data?.vintageParameters?.every((v) => v.bufferPct > 0))
-            completed.push(7);
-        if (data.methodologySelections?.length > 0) completed.push(8);
-        if (data?.audit?.auditors?.length > 0) completed.push(9);
-        if (data?.audit?.audits?.length > 0) completed.push(10);
+            completed.push(8);
+        if (data.methodologySelections?.length > 0) completed.push(9);
+        if (data?.audit?.auditors?.length > 0) completed.push(10);
+        if (data?.audit?.audits?.length > 0) completed.push(11);
+        if(data?.tokens?.length > 0) completed.push(12)
 
         return completed;
     };
@@ -103,31 +106,31 @@ export default function TokenizationStepper() {
     React.useEffect(() => {
         if (data) {
             if (data?.modules?.filter((m) => m.sensors.length === 0).length > 0) {
-                setActiveStep(0);
-            } else if (everySensorHavingCalibration === false) {
                 setActiveStep(1);
-            } else if (everySensorHavingTelemetry === false) {
+            } else if (everySensorHavingCalibration === false) {
                 setActiveStep(2);
-            } else if (!data?.onchain?.methodologyIdentifier) {
+            } else if (everySensorHavingTelemetry === false) {
                 setActiveStep(3);
-            } else if (data?.vintageParameters?.length === 0) {
+            } else if (!data?.onchain?.methodologyIdentifier) {
                 setActiveStep(4);
-            } else if (data?.audit?.emissionEvidence?.length === 0) {
+            } else if (data?.vintageParameters?.length === 0) {
                 setActiveStep(5);
-            } else if (data?.audit?.leakage?.length === 0) {
+            } else if (data?.audit?.emissionEvidence?.length === 0) {
                 setActiveStep(6);
-            } else if (!data?.vintageParameters?.every((v) => v.bufferPct)) {
+            } else if (data?.audit?.leakage?.length === 0) {
                 setActiveStep(7);
-            } else if (!data?.methodologySelections?.length > 0) {
+            } else if (!data?.vintageParameters?.every((v) => v.bufferPct)) {
                 setActiveStep(8);
-            } else if (!data?.audit?.auditors?.length > 0) {
+            } else if (!data?.methodologySelections?.length > 0) {
                 setActiveStep(9);
-            } else if (!data?.audit?.audits?.length > 0) {
+            } else if (!data?.audit?.auditors?.length > 0) {
                 setActiveStep(10);
+            } else if (!data?.audit?.audits?.length > 0) {
+                setActiveStep(11);
             } else if (!data?.tokens?.length > 0) {
-                setActiveStep(11)
-            } else {
                 setActiveStep(12)
+            } else {
+                setActiveStep(13)
             }
         }
     }, [data]);
@@ -272,7 +275,17 @@ export default function TokenizationStepper() {
                             </Typography>
 
                             <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, background: "#fafafa" }}>
+
                                 {activeStep === 0 && (
+                                    <ProjectDetails
+                                        data={data}
+                                        handleNext={(formSubmit = false) => {
+                                            handleNext();
+                                        }}
+                                        projectId={projectId}
+                                    />
+                                )}
+                                {activeStep === 1 && (
                                     <RegisterSensorData
                                         modules={data ? data.modules : []}
                                         sensors={data ? data.sensors : []}
@@ -283,9 +296,10 @@ export default function TokenizationStepper() {
                                             handleNext();
                                         }}
                                         projectId={projectId}
+                                        handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 1 && (
+                                {activeStep === 2 && (
                                     <RegisterCalibration
                                         modules={data ? data.modules : []}
                                         handleNext={(formSubmit = false) => {
@@ -298,7 +312,7 @@ export default function TokenizationStepper() {
                                         projectId={projectId}
                                     />
                                 )}
-                                {activeStep === 2 && (
+                                {activeStep === 3 && (
                                     <RecordTelementryData
                                         modules={data ? data.modules : []}
                                         handleNext={(formSubmit = false) => {
@@ -311,7 +325,7 @@ export default function TokenizationStepper() {
                                         projectId={projectId}
                                     />
                                 )}
-                                {activeStep === 3 && (
+                                {activeStep === 4 && (
                                     <MethodologyForm
                                         modules={data ? data.modules : []}
                                         projectDetails={data}
@@ -326,7 +340,7 @@ export default function TokenizationStepper() {
                                     />
                                 )}
 
-                                {activeStep === 4 && (
+                                {activeStep === 5 && (
                                     <VintageForm
                                         projectDetails={data}
                                         projectId={projectId}
@@ -340,7 +354,7 @@ export default function TokenizationStepper() {
                                     />
                                 )}
 
-                                {activeStep === 5 && (
+                                {activeStep === 6 && (
                                     <AddEmissionData
                                         projectDetails={data}
                                         projectId={projectId}
@@ -353,7 +367,7 @@ export default function TokenizationStepper() {
                                         handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 6 && (
+                                {activeStep === 7 && (
                                     <AddLickageData
                                         projectDetails={data}
                                         projectId={projectId}
@@ -366,7 +380,7 @@ export default function TokenizationStepper() {
                                         handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 7 && (
+                                {activeStep === 8 && (
                                     <BufferSetting
                                         projectDetails={data}
                                         projectId={projectId}
@@ -379,7 +393,7 @@ export default function TokenizationStepper() {
                                         handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 8 && (
+                                {activeStep === 9 && (
                                     <IssuanceFinalScreen
                                         projectDetails={data}
                                         projectId={projectId}
@@ -392,7 +406,7 @@ export default function TokenizationStepper() {
                                         handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 9 && (
+                                {activeStep === 10 && (
                                     <AssignAuditor
                                         projectDetails={data}
                                         projectId={projectId}
@@ -405,7 +419,7 @@ export default function TokenizationStepper() {
                                         handleBack={handleBack}
                                     />
                                 )}
-                                {activeStep === 10 && (
+                                {activeStep === 11 && (
                                     <SubmitAuditorDecision
                                         projectDetails={data}
                                         projectId={projectId}
@@ -420,7 +434,7 @@ export default function TokenizationStepper() {
                                 )}
 
                                 {
-                                    activeStep === 11 && (
+                                    activeStep === 12 && (
                                         <CreateCredits
                                             projectDetails={data}
                                             projectId={projectId}
@@ -437,7 +451,7 @@ export default function TokenizationStepper() {
                                 }
 
                                 {
-                                    activeStep === 12 && <ExecuteMint projectDetails={data}
+                                    activeStep === 13 && <ExecuteMint projectDetails={data}
                                         projectId={projectId}
                                         handleNext={(formSubmit = false) => {
                                             if (formSubmit === true) {

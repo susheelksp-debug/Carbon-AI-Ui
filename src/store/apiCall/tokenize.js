@@ -432,7 +432,7 @@ export const assignAuditor = (projectId, setLoading, payload, callBack) => async
     setLoading(true);
     try {
         const response = await axiosInstance.post(`/admin/projects/${projectId}/auditor`, payload)
-        if (response.status === 200) {
+        if (response.status === 201) {
             dispatch(enqueue({ message: "Auditor assigned to the project Successfully.", variant: 'success' }));
             if (callBack) callBack();
         }

@@ -31,7 +31,7 @@ const schema = Yup.object().shape({
     )
 });
 
-export default function RegisterSensorData({ modules, sensors, handleNext, projectId }) {
+export default function RegisterSensorData({ modules, sensors, handleNext, projectId, handleBack }) {
     const dispatch = useDispatch()
     const { user } = useSelector((state) => state.auth);
     const [loading, setLoading] = React.useState(false);
@@ -102,7 +102,13 @@ export default function RegisterSensorData({ modules, sensors, handleNext, proje
                         ))}
                 </Grid>
 
-                <Grid size={{ xs: 12 }} display={"flex"} justifyContent="flex-end">
+                <Grid size={{ xs: 12 }} display={"flex"} justifyContent="space-between">
+                    <Button
+                        onClick={handleBack}
+                        variant="outlined"
+                    >
+                        Back
+                    </Button>
                     <Button variant="contained" sx={{ mt: 2 }} onClick={handleNext}>
                         Next
                     </Button>
@@ -316,7 +322,14 @@ export default function RegisterSensorData({ modules, sensors, handleNext, proje
                             })}
 
                             {/* Submit */}
-                            <Grid size={{ xs: 12 }} display={"flex"} justifyContent="flex-end">
+                            <Grid size={{ xs: 12 }} display={"flex"} justifyContent="space-between">
+                                <Button
+                                    disabled={loading}
+                                    onClick={handleBack}
+                                    variant="outlined"
+                                >
+                                    Back
+                                </Button>
                                 <Button disabled={loading} loading={loading} variant="contained" color="primary" type="submit">
                                     Next
                                 </Button>

@@ -53,7 +53,7 @@ axiosInstance.interceptors.response.use(
             if (
                 error.response.status === 401 &&
                 (error?.response?.data?.error === 'Token expired' ||
-                    error?.response?.data?.error === 'Required token') &&
+                    error?.response?.data?.error === 'You are not authorized to perform this action.') &&
                 !originalRequest._retry
             ) {
                 handleTokenExpireModal();

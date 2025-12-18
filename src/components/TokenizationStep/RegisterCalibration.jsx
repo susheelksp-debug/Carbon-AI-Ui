@@ -30,6 +30,7 @@ const schema = Yup.object().shape({
 });
 
 export default function RegisterCalibration({ modules, handleNext, handleBack, projectId }) {
+    console.log("modules", modules)
     const sensors = modules?.flatMap((m) => m.sensors || []) || [];
     const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
@@ -37,7 +38,7 @@ export default function RegisterCalibration({ modules, handleNext, handleBack, p
 
     const formik = useFormik({
         initialValues: {
-            modules: sensors.map((m) => ({
+            modules: sensors?.map((m) => ({
                 sensorId: m.sensorId || "",
                 metaDataFile: null,
                 certificateCid: "",
@@ -76,6 +77,8 @@ export default function RegisterCalibration({ modules, handleNext, handleBack, p
         sensor.calibration.certificateUri.trim().length > 0;
 
     const everySensorHavingCalibration = sensors?.every(hasCalibration) || false;
+    console.log("everySensorHavingCalibration", everySensorHavingCalibration);
+
 
     if (everySensorHavingCalibration) {
         return (
